@@ -1,0 +1,75 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.6.0">
+  <diagram name="第 1 页" id="u-iT3c2ndpKe39PeoZBT">
+    <mxGraphModel dx="905" dy="694" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="client" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="客户端层&#xa;(Web / Mobile App)" vertex="1">
+          <mxGeometry height="80" width="300" x="350" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="网关层&#xa;Spring Cloud Gateway&#xa;路由转发 | 鉴权 | 限流" vertex="1">
+          <mxGeometry height="90" width="340" x="330" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="user" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="用户服务&#xa;User Service&#xa;注册登录&#xa;用户信息管理&#xa;权限管理" vertex="1">
+          <mxGeometry height="140" width="200" x="80" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="product" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="商品服务&#xa;Product Service&#xa;商品管理&#xa;商品查询&#xa;库存查询" vertex="1">
+          <mxGeometry height="140" width="200" x="350" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="order" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="订单服务&#xa;Order Service&#xa;订单创建&#xa;订单查询&#xa;订单状态更新" vertex="1">
+          <mxGeometry height="140" width="200" x="627" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="GtF3inxE_wHNfzKkSo0J-3" edge="1" parent="1" source="inventory" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="560" y="740" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="inventory" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0cee2;strokeColor=#56517e;" value="库存服务&#xa;Inventory Service&#xa;库存管理&#xa;库存扣减&#xa;库存回滚" vertex="1">
+          <mxGeometry height="140" width="200" x="460" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="middleware" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bac8d3;strokeColor=#23445d;" value="" vertex="1">
+          <mxGeometry height="170" width="670" x="120" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" value="Redis&#xa;(缓存)" vertex="1">
+          <mxGeometry height="80" width="130" x="150" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="mysql" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" value="MySQL&#xa;(持久化)" vertex="1">
+          <mxGeometry height="80" width="126" x="304" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="mq" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" value="RabbitMQ&#xa;(消息队列)" vertex="1">
+          <mxGeometry height="80" width="120" x="460" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="nacos" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" value="Nacos&#xa;(注册中心)" vertex="1">
+          <mxGeometry height="80" width="120" x="610" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="client" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" target="gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" target="user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" target="product">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="gateway" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" target="order">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="product" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" target="inventory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="order" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;" target="inventory">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GtF3inxE_wHNfzKkSo0J-1" edge="1" parent="1" source="user" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.09;entryY=0.021;entryDx=0;entryDy=0;entryPerimeter=0;" target="middleware">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GtF3inxE_wHNfzKkSo0J-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="中间件" vertex="1">
+          <mxGeometry height="30" width="60" x="414" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="GtF3inxE_wHNfzKkSo0J-5" edge="1" parent="1" source="order" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.907;entryY=-0.021;entryDx=0;entryDy=0;entryPerimeter=0;" target="middleware">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
