@@ -1,0 +1,39 @@
+# Elasticsearch 服务 - 与 docker-compose.yml 或 docker-compose-rw.yml 配合
+# 启动: docker-compose -f docker-compose.yml -f docker-compose-es.yml up -d
+
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.10
+    container_name: seckill-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - seckill-net
+
+  product-service:
+    environment:
+      SPRING_PROFILES_ACTIVE: docker,es
+      SPRING_ELASTICSEARCH_REST_URIS: http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+volumes:
+  es_data:

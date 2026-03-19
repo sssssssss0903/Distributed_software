@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 用户控制器
@@ -26,6 +28,20 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @org.springframework.beans.factory.annotation.Value("${server.port:8081}")
+    private String serverPort;
+
+    @ApiOperation("健康检查/实例信息(用于负载均衡验证)")
+    @GetMapping("/health")
+    public Result<Map<String, Object>> health() {
+        Map<String, Object> info = new HashMap<>();
+        info.put("port", serverPort);
+        info.put("status", "UP");
+        info.put("service", "seckill-user-service");
+        log.info("健康检查请求 - 实例端口: {}", serverPort);
+        return Result.success(info);
+    }
 
     @ApiOperation("用户注册")
     @PostMapping("/register")

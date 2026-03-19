@@ -135,6 +135,13 @@
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+
+            <!-- 动态数据源 - 读写分离 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>3.6.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

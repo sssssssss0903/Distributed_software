@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    dynamic:
+      datasource:
+        master:
+          url: jdbc:mysql://mysql-master:3306/seckill_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+        slave:
+          url: jdbc:mysql://mysql-slave:3306/seckill_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+
+  redis:
+    host: redis
+    port: 6379
+
+  elasticsearch:
+    rest:
+      uris: http://elasticsearch:9200

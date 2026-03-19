@@ -1,0 +1,8 @@
+# IP哈希 (ip_hash) 负载均衡配置示例
+# 使用方法: 复制到 default.conf 中替换 upstream 块
+#
+# upstream backend_api {
+#     ip_hash;
+#     server backend-1:8081;
+#     server backend-2:8082;
+# }

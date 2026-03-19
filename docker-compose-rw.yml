@@ -1,0 +1,185 @@
+# MySQL 读写分离完整环境
+# 启动: docker-compose -f docker-compose-rw.yml up -d --build
+
+version: "3.8"
+
+services:
+  mysql-master:
+    image: mysql:8.0
+    container_name: seckill-mysql-master
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_master_data:/var/lib/mysql
+      - ./scripts/mysql-master:/docker-entrypoint-initdb.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      seckill-net:
+        aliases:
+          - mysql
+
+  mysql-slave:
+    image: mysql:8.0
+    container_name: seckill-mysql-slave
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_slave_data:/var/lib/mysql
+      - ./scripts/mysql-slave:/docker-entrypoint-initdb.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --server-id=2
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - seckill-net
+
+  replication-setup:
+    image: mysql:8.0
+    container_name: seckill-replication-setup
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        until mysql -hmysql-master -uroot -proot -e "SELECT 1" 2>/dev/null; do sleep 2; done
+        until mysql -hmysql-slave -uroot -proot -e "SELECT 1" 2>/dev/null; do sleep 2; done
+        sleep 5
+        BINLOG=$$(mysql -hmysql-master -uroot -proot -N -e "SHOW MASTER STATUS" 2>/dev/null | awk '{print $$1}')
+        mysql -hmysql-slave -uroot -proot -e "STOP SLAVE; CHANGE MASTER TO MASTER_HOST='mysql-master', MASTER_USER='repl', MASTER_PASSWORD='repl', MASTER_LOG_FILE='$$BINLOG', MASTER_LOG_POS=4; START SLAVE;" 2>/dev/null
+        echo "Replication configured"
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+      mysql-slave:
+        condition: service_healthy
+    networks:
+      - seckill-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: seckill-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - seckill-net
+
+  backend-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_MODULE: seckill-user-service
+    container_name: seckill-backend-1
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - seckill-net
+
+  backend-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_MODULE: seckill-user-service
+    container_name: seckill-backend-2
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - seckill-net
+
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_MODULE: seckill-product-service
+    container_name: seckill-product-service
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8083
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+      mysql-slave:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - seckill-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: seckill-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend-1
+      - backend-2
+      - product-service
+    networks:
+      - seckill-net
+
+volumes:
+  mysql_master_data:
+  mysql_slave_data:
+  redis_data:
+
+networks:
+  seckill-net:
+    driver: bridge

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>秒杀系统 - 商品展示</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>秒杀系统</h1>
+      <p class="subtitle">动静分离演示 - 静态资源由 Nginx 直接提供</p>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <h2>负载均衡测试</h2>
+        <button id="healthBtn" class="btn">获取后端实例信息</button>
+        <div id="healthResult" class="result"></div>
+      </section>
+
+      <section class="card">
+        <h2>商品列表 (Redis缓存)</h2>
+        <button id="loadProductsBtn" class="btn">加载商品</button>
+        <div id="productList" class="product-list"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>静态文件: HTML/CSS/JS | 动态 API: 通过 Nginx 负载均衡转发</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

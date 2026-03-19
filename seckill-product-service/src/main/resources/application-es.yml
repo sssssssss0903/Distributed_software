@@ -1,0 +1,7 @@
+# Elasticsearch 配置 - 使用方式: --spring.profiles.active=es
+spring:
+  autoconfigure:
+    exclude: [] # 覆盖默认 exclude，启用 ES
+  elasticsearch:
+    rest:
+      uris: ${SPRING_ELASTICSEARCH_REST_URIS:http://localhost:9200}
