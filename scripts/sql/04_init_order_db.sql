@@ -19,6 +19,7 @@ CREATE TABLE `order` (
   `pay_time` DATETIME COMMENT '支付时间',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  UNIQUE KEY uk_user_product_seckill (`user_id`, `product_id`, `is_seckill`),
   INDEX idx_user (`user_id`),
   INDEX idx_order_no (`order_no`),
   INDEX idx_status (`status`),

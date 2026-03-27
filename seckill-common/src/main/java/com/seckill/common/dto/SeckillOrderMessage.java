@@ -1,0 +1,17 @@
+package com.seckill.common.dto;
+
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Data
+public class SeckillOrderMessage implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Long orderId;
+    private Long userId;
+    private Long productId;
+    private Integer quantity;
+    private String reason;
+}
