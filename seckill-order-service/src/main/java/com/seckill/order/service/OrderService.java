@@ -13,4 +13,6 @@ public interface OrderService {
     Order getByOrderId(Long orderId);
 
     List<Order> getByUserId(Long userId);
+
+    void payOrder(Long orderId, Long userId);
 }

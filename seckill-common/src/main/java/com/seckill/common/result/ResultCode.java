@@ -38,7 +38,11 @@ public enum ResultCode {
     SECKILL_ENDED(5002, "秒杀已结束"),
     SECKILL_SOLD_OUT(5003, "秒杀商品已售罄"),
     SECKILL_REPEAT(5004, "请勿重复秒杀"),
-    SECKILL_LIMIT(5005, "秒杀请求过于频繁");
+    SECKILL_LIMIT(5005, "秒杀请求过于频繁"),
+
+    ORDER_PAY_FAILED(4004, "订单支付失败"),
+    ORDER_ALREADY_PAID(4005, "订单已支付，请勿重复支付"),
+    ORDER_PAY_TIMEOUT(4006, "订单支付超时，已自动取消");
 
     private final Integer code;
     private final String message;

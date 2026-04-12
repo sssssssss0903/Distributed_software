@@ -35,6 +35,22 @@ public class InventoryDeductConsumer {
             return;
         }
 
-        log.info("数据库库存扣减成功, productId={}, orderId={}", message.getProductId(), message.getOrderId());
+        log.info("数据库库存扣减成功（锁定库存）, productId={}, orderId={}", message.getProductId(), message.getOrderId());
+    }
+
+    @KafkaListener(topics = "seckill.order.rollback", groupId = "seckill-inventory-rollback")
+    public void consumeRollback(String payload) {
+        SeckillOrderMessage message = JSON.parseObject(payload, SeckillOrderMessage.class);
+        if (message == null || message.getProductId() == null || message.getQuantity() == null) {
+            return;
+        }
+
+        // 支付失败或超时，回滚锁定库存
+        int affected = inventoryMapper.rollbackDeduct(message.getProductId(), message.getQuantity());
+        if (affected > 0) {
+            log.info("库存回滚成功, productId={}, orderId={}, reason={}", message.getProductId(), message.getOrderId(), message.getReason());
+        } else {
+            log.warn("库存回滚失败（可能已回滚）, productId={}, orderId={}", message.getProductId(), message.getOrderId());
+        }
     }
 }

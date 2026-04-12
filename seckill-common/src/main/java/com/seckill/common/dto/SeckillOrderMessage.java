@@ -14,4 +14,5 @@ public class SeckillOrderMessage implements Serializable {
     private Long productId;
     private Integer quantity;
     private String reason;
+    private String action;
 }

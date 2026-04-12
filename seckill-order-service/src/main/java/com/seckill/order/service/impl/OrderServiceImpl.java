@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 public class OrderServiceImpl implements OrderService {
 
     private static final String TOPIC_CREATE = "seckill.order.create";
+    private static final String TOPIC_PAY = "seckill.order.pay";
+    private static final int MAX_PURCHASE_LIMIT = 1;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -51,6 +53,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Long remain = deductStockFromRedis(dto.getProductId(), dto.getQuantity());
+        if (remain != null && remain == -2) {
+            stringRedisTemplate.delete(userProductKey);
+            throw new BusinessException(ResultCode.SECKILL_LIMIT.getCode(), "超过限购数量（每人限购" + MAX_PURCHASE_LIMIT + "件）");
+        }
         if (remain == null || remain < 0) {
             stringRedisTemplate.delete(userProductKey);
             throw new BusinessException(ResultCode.SECKILL_SOLD_OUT.getCode(), ResultCode.SECKILL_SOLD_OUT.getMessage());
@@ -90,19 +96,54 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.selectList(wrapper);
     }
 
+    @Override
+    public void payOrder(Long orderId, Long userId) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND.getCode(), ResultCode.ORDER_NOT_FOUND.getMessage());
+        }
+        if (!order.getUserId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN.getCode(), "无权操作此订单");
+        }
+        if (order.getStatus() == 1) {
+            throw new BusinessException(ResultCode.ORDER_ALREADY_PAID.getCode(), ResultCode.ORDER_ALREADY_PAID.getMessage());
+        }
+        if (order.getStatus() != 0) {
+            throw new BusinessException(ResultCode.ORDER_STATUS_ERROR.getCode(), "订单状态不允许支付");
+        }
+
+        SeckillOrderMessage message = new SeckillOrderMessage();
+        message.setOrderId(orderId);
+        message.setUserId(userId);
+        message.setProductId(order.getProductId());
+        message.setQuantity(order.getQuantity());
+        message.setAction("PAY");
+
+        try {
+            kafkaTemplate.send(TOPIC_PAY, JSON.toJSONString(message));
+            log.info("支付消息发送成功, orderId={}", orderId);
+        } catch (Exception e) {
+            log.error("发送支付消息失败, orderId={}", orderId, e);
+            throw new BusinessException(ResultCode.ORDER_PAY_FAILED.getCode(), "支付请求发送失败，请重试");
+        }
+    }
+
     private Long deductStockFromRedis(Long productId, Integer quantity) {
         String script =
                 "local stock = redis.call('GET', KEYS[1]);" +
                 "if (not stock) then return -1 end;" +
                 "stock = tonumber(stock);" +
                 "local q = tonumber(ARGV[1]);" +
+                "local limit = tonumber(ARGV[2]);" +
+                "if (q > limit) then return -2 end;" +
                 "if (stock < q) then return -1 end;" +
                 "return redis.call('DECRBY', KEYS[1], q);";
         DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
         redisScript.setScriptText(script);
         redisScript.setResultType(Long.class);
         return stringRedisTemplate.execute(redisScript,
-                Collections.singletonList(stockKey(productId)), String.valueOf(quantity));
+                Collections.singletonList(stockKey(productId)),
+                String.valueOf(quantity), String.valueOf(MAX_PURCHASE_LIMIT));
     }
 
     private void rollbackRedis(Long userId, Long productId, Integer quantity) {

@@ -14,7 +14,7 @@ CREATE TABLE `order` (
   `price` DECIMAL(10,2) NOT NULL COMMENT '商品单价',
   `quantity` INT NOT NULL COMMENT '购买数量',
   `total_amount` DECIMAL(10,2) NOT NULL COMMENT '订单总额',
-  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '订单状态:0-待支付,1-已支付,2-已取消,3-已完成',
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '订单状态:0-待支付,1-已支付,2-已取消(回滚),3-支付失败,4-超时取消',
   `is_seckill` TINYINT DEFAULT 0 COMMENT '是否秒杀订单:0-否,1-是',
   `pay_time` DATETIME COMMENT '支付时间',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

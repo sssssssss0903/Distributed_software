@@ -38,4 +38,11 @@ public class OrderController {
     public Result<List<Order>> getByUserId(@PathVariable Long userId) {
         return Result.success(orderService.getByUserId(userId));
     }
+
+    @ApiOperation("订单支付")
+    @PostMapping("/pay/{orderId}")
+    public Result<String> pay(@PathVariable Long orderId, @RequestParam Long userId) {
+        orderService.payOrder(orderId, userId);
+        return Result.success("支付请求已受理，正在处理中");
+    }
 }
