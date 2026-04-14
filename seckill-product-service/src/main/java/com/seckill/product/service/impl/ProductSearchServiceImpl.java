@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,9 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     @Override
     public List<ProductDocument> search(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return searchRepository.findAll();
+            List<ProductDocument> result = new ArrayList<>();
+            searchRepository.findAll().forEach(result::add);
+            return result;
         }
         return searchRepository.findByNameContainingOrDescriptionContaining(keyword, keyword);
     }

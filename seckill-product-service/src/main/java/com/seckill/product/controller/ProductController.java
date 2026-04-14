@@ -1,5 +1,7 @@
 package com.seckill.product.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.seckill.common.result.Result;
 import com.seckill.product.document.ProductDocument;
 import com.seckill.product.entity.Product;
@@ -33,6 +35,7 @@ public class ProductController {
 
     @ApiOperation("商品详情(Redis缓存)")
     @GetMapping("/{id}")
+    @SentinelResource(value = "getProductDetail", blockHandler = "getProductDetailBlockHandler")
     public Result<Product> getDetail(@PathVariable Long id) {
         Product product = productService.getProductDetail(id);
         return Result.success(product);
@@ -40,6 +43,7 @@ public class ProductController {
 
     @ApiOperation("商品列表(读从库)")
     @GetMapping("/list")
+    @SentinelResource(value = "listProducts", blockHandler = "listProductsBlockHandler")
     public Result<List<Product>> list() {
         return Result.success(productService.listProducts());
     }
@@ -82,5 +86,17 @@ public class ProductController {
         info.put("service", "seckill-product-service");
         log.info("健康检查 - 端口: {}", serverPort);
         return Result.success(info);
+    }
+
+    // ========== Sentinel限流降级处理方法 ==========
+
+    public Result<Product> getProductDetailBlockHandler(Long id, BlockException e) {
+        log.warn("商品详情接口被限流: productId={}", id);
+        return Result.error(429, "查询过于频繁，请稍后重试");
+    }
+
+    public Result<List<Product>> listProductsBlockHandler(BlockException e) {
+        log.warn("商品列表接口被限流");
+        return Result.error(429, "查询过于频繁，请稍后重试");
     }
 }

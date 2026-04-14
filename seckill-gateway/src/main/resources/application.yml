@@ -1,0 +1,107 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: seckill-gateway
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: dev
+
+    gateway:
+      # 开启基于Nacos服务发现的动态路由
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      # 路由规则配置
+      routes:
+        # 用户服务路由
+        - id: seckill-user-service
+          uri: lb://seckill-user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=0
+
+        # 商品服务路由
+        - id: seckill-product-service
+          uri: lb://seckill-product-service
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=0
+
+        # 订单服务路由
+        - id: seckill-order-service
+          uri: lb://seckill-order-service
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=0
+
+        # 库存服务路由
+        - id: seckill-inventory-service
+          uri: lb://seckill-inventory-service
+          predicates:
+            - Path=/api/inventory/**
+          filters:
+            - StripPrefix=0
+
+    # Sentinel流量治理配置
+    sentinel:
+      transport:
+        dashboard: localhost:8858
+        port: 8719
+      # 立即加载规则
+      eager: true
+      # Sentinel数据源 - 从Nacos加载规则
+      datasource:
+        # 网关限流规则
+        gw-flow:
+          nacos:
+            server-addr: localhost:8848
+            namespace: dev
+            data-id: seckill-gateway-flow-rules.json
+            group-id: DEFAULT_GROUP
+            data-type: json
+            rule-type: gw-flow
+        # 降级规则
+        degrade:
+          nacos:
+            server-addr: localhost:8848
+            namespace: dev
+            data-id: seckill-gateway-degrade-rules.json
+            group-id: DEFAULT_GROUP
+            data-type: json
+            rule-type: degrade
+
+  # 跨域配置
+  webflux:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "*"
+      allowed-headers: "*"
+
+# 网关白名单 - 不需要JWT验证的路径
+gateway:
+  auth:
+    skip-urls:
+      - /api/user/login
+      - /api/user/register
+      - /api/user/health
+      - /api/product/list
+      - /api/product/search
+      - /api/product/health
+      - /api/config/**
+
+logging:
+  level:
+    com.seckill.gateway: debug
+    org.springframework.cloud.gateway: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"

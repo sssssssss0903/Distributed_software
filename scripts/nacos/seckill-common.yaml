@@ -1,0 +1,14 @@
+# Nacos共享配置 - 所有服务共享
+# DataId: seckill-common.yaml | Group: DEFAULT_GROUP
+# 在Nacos控制台创建此配置，修改后所有服务自动刷新
+
+# 秒杀活动配置（动态刷新）
+seckill:
+  # 秒杀活动名称
+  activity-name: "618年中大促秒杀"
+  # 每人限购数量
+  max-purchase-limit: 1
+  # 秒杀开关（可动态关闭）
+  enable: true
+  # 限流QPS
+  rate-limit: 100

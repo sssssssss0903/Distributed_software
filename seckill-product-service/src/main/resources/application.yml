@@ -27,6 +27,18 @@ spring:
     port: 6379
     database: 0
 
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: dev
+
+    sentinel:
+      transport:
+        dashboard: localhost:8858
+        port: 8721
+      eager: true
+
   # Elasticsearch 可选，使用 es profile 时启用
   autoconfigure:
     exclude:

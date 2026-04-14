@@ -10,6 +10,12 @@ spring:
     url: jdbc:mysql://localhost:3306/seckill_inventory?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: root
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: dev
+
   kafka:
     bootstrap-servers: localhost:9092
     consumer:

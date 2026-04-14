@@ -1,0 +1,26 @@
+[
+  {
+    "resource": "seckill-order-service",
+    "resourceMode": 0,
+    "count": 100,
+    "intervalSec": 1
+  },
+  {
+    "resource": "seckill-product-service",
+    "resourceMode": 0,
+    "count": 300,
+    "intervalSec": 1
+  },
+  {
+    "resource": "seckill-user-service",
+    "resourceMode": 0,
+    "count": 200,
+    "intervalSec": 1
+  },
+  {
+    "resource": "seckill-api",
+    "resourceMode": 1,
+    "count": 50,
+    "intervalSec": 1
+  }
+]

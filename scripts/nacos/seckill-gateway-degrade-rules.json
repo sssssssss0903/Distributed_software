@@ -1,0 +1,28 @@
+[
+  {
+    "resource": "seckill-order-service",
+    "grade": 0,
+    "count": 0.5,
+    "slowRatioThreshold": 0.5,
+    "timeWindow": 10,
+    "minRequestAmount": 5,
+    "statIntervalMs": 10000
+  },
+  {
+    "resource": "seckill-order-service",
+    "grade": 1,
+    "count": 0.5,
+    "timeWindow": 10,
+    "minRequestAmount": 5,
+    "statIntervalMs": 10000
+  },
+  {
+    "resource": "seckill-product-service",
+    "grade": 0,
+    "count": 0.5,
+    "slowRatioThreshold": 0.5,
+    "timeWindow": 10,
+    "minRequestAmount": 5,
+    "statIntervalMs": 10000
+  }
+]
